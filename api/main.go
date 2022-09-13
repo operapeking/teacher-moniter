@@ -17,9 +17,9 @@ func SendModify(status bool) {
 func main() {
 	args := os.Args
 	host = args[1]
-	if args[2] == "0" {
-		SendModify(false)
-	} else {
+	if args[2] == "1" {
 		SendModify(true)
+	} else {
+		SendModify(false)
 	}
 }
