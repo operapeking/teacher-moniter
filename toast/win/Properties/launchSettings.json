@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SendToast": {
+      "commandName": "Project",
+      "commandLineArgs": "http://127.0.0.1:10086"
+    }
+  }
+}
