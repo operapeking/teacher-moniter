@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"io"
-	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -16,6 +16,12 @@ type Status struct {
 }
 
 func main() {
+	var ip string
+	var port string
+	flag.StringVar(&ip, "ip", "127.0.0.1", "listening ip")
+	flag.StringVar(&port, "port", "10086", "listening port")
+	flag.Parse()
+
 	status := Status{
 		Time:     time.Now(),
 		Ip:       "127.0.0.1",
@@ -35,5 +41,5 @@ func main() {
 		json.Unmarshal(body, &status.IsComing)
 		ctx.String(200, "OK")
 	})
-	r.Run(os.Args[1])
+	r.Run(ip + ":" + port)
 }

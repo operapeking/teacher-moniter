@@ -1,5 +1,6 @@
 #!/bin/bash
 dir=$(pwd)
+export GIN_MODE=release
 for target in "linux" "windows"
 do
     export GOOS=$target

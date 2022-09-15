@@ -3,8 +3,8 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"flag"
 	"net/http"
-	"os"
 )
 
 var host string
@@ -15,9 +15,16 @@ func SendModify(status bool) {
 }
 
 func main() {
-	args := os.Args
-	host = args[1]
-	if args[2] == "1" {
+	var ip string
+	var port string
+	var op string
+	flag.StringVar(&ip, "ip", "127.0.0.1", "server ip")
+	flag.StringVar(&port, "port", "10086", "server port")
+	flag.StringVar(&op, "op", "0", "1 is coming, others are gone")
+	flag.Parse()
+	host = "http://" + ip + ":" + port
+	println()
+	if op == "1" {
 		SendModify(true)
 	} else {
 		SendModify(false)
