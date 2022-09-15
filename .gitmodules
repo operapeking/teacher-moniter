@@ -1,0 +1,3 @@
+[submodule "toast/win"]
+	path = toast/win
+	url = git@github.com:operapeking/SendToast.git
