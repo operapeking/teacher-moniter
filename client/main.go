@@ -10,30 +10,38 @@ import (
 
 var host string
 
-var gone = 0
-
 type Status struct {
 	Time     time.Time `json:"time"`
 	Ip       string    `json:"ip"`
 	IsComing bool      `json:"isComing"`
+	Who      string    `json:"Who"`
 }
+
+type Send struct {
+	IsComing bool   `json:"isComing"`
+	Who      string `json:"who"`
+}
+
+var now, last Status
 
 func SendQuery() {
-	var status Status
 	resp, _ := http.Get(host + "/query")
-	json.NewDecoder(resp.Body).Decode(&status)
-	if status.IsComing && gone != 2 {
-		fmt.Println("有人来了！来自：" + status.Ip + " 更新时间：" + status.Time.Format("15:04:05"))
-		gone = 2
-	} else if !status.IsComing && gone != 1 {
-		fmt.Println("有人走了！来自：" + status.Ip + " 更新时间：" + status.Time.Format("15:04:05"))
-		gone = 1
+	json.NewDecoder(resp.Body).Decode(&now)
+	if now.IsComing == last.IsComing && now.Who == last.Who {
+		return
 	}
+	if now.IsComing {
+		fmt.Println(now.Who + " 来了！来自：" + now.Ip + " 更新时间：" + now.Time.Format("15:04:05"))
+	} else {
+		fmt.Println(now.Who + " 走了！来自：" + now.Ip + " 更新时间：" + now.Time.Format("15:04:05"))
+	}
+	last = now
 }
 
-func SendModify(status bool) {
-	body, _ := json.Marshal(status)
-	http.Post(host+"/modify", "application/json", bytes.NewBuffer(body))
+func SendModify(send Send) {
+	body := new(bytes.Buffer)
+	json.NewEncoder(body).Encode(send)
+	http.Post(host+"/modify", "application/json", body)
 }
 
 func Query() {
@@ -44,14 +52,10 @@ func Query() {
 }
 
 func Modify() {
-	var input string
+	var send Send
 	for {
-		fmt.Scan(&input)
-		if input == "1" {
-			SendModify(true)
-		} else {
-			SendModify(false)
-		}
+		fmt.Scan(&send.IsComing, &send.Who)
+		SendModify(send)
 	}
 }
 

@@ -7,26 +7,27 @@ import (
 	"net/http"
 )
 
-var host string
+type Send struct {
+	IsComing bool   `json:"isComing"`
+	Who      string `json:"who"`
+}
 
-func SendModify(status bool) {
-	body, _ := json.Marshal(status)
-	http.Post(host+"/modify", "application/json", bytes.NewBuffer(body))
+var host string
+var send Send
+
+func SendModify() {
+	body := new(bytes.Buffer)
+	json.NewEncoder(body).Encode(send)
+	http.Post(host+"/modify", "application/json", body)
 }
 
 func main() {
-	var ip string
-	var port string
-	var op string
+	var ip, port string
 	flag.StringVar(&ip, "ip", "127.0.0.1", "server ip")
 	flag.StringVar(&port, "port", "10086", "server port")
-	flag.StringVar(&op, "op", "0", "1 is coming, others are gone")
+	flag.BoolVar(&send.IsComing, "op", false, "1 is coming, 0 is gone")
+	flag.StringVar(&send.Who, "who", "none", "who is coming")
 	flag.Parse()
 	host = "http://" + ip + ":" + port
-	println()
-	if op == "1" {
-		SendModify(true)
-	} else {
-		SendModify(false)
-	}
+	SendModify()
 }
