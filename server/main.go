@@ -3,9 +3,9 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"net/http"
+	"strings"
 	"time"
-
-	"github.com/gin-gonic/gin"
 )
 
 type Status struct {
@@ -26,28 +26,22 @@ func main() {
 	flag.StringVar(&ip, "ip", "127.0.0.1", "listening ip")
 	flag.StringVar(&port, "port", "10086", "listening port")
 	flag.Parse()
+	http.HandleFunc("/query", QueryPage)
+	http.HandleFunc("/modify", ModifyPage)
+	http.ListenAndServe(ip+":"+port, nil)
+}
 
-	status := Status{
-		Time:     time.Now(),
-		Ip:       "127.0.0.1",
-		IsComing: false,
-		Who:      "none",
-	}
-	var send Send
-	r := gin.Default()
-	r.GET("/", func(ctx *gin.Context) {
-		ctx.String(200, "Service started")
-	})
-	r.GET("/query", func(ctx *gin.Context) {
-		ctx.JSON(200, status)
-	})
-	r.POST("/modify", func(ctx *gin.Context) {
-		json.NewDecoder(ctx.Request.Body).Decode(&send)
-		status.Time = time.Now()
-		status.Ip = ctx.ClientIP()
-		status.IsComing = send.IsComing
-		status.Who = send.Who
-		ctx.String(200, "OK")
-	})
-	r.Run(ip + ":" + port)
+var status Status
+var send Send
+
+func QueryPage(w http.ResponseWriter, r *http.Request) {
+	json.NewEncoder(w).Encode(status)
+}
+
+func ModifyPage(w http.ResponseWriter, r *http.Request) {
+	json.NewDecoder(r.Body).Decode(&send)
+	status.Time = time.Now()
+	status.Ip = r.RemoteAddr[:strings.Index(r.RemoteAddr, ":")]
+	status.IsComing = send.IsComing
+	status.Who = send.Who
 }
