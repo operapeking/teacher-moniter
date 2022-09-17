@@ -1,3 +1,6 @@
 [submodule "toast/win"]
 	path = toast/win
 	url = git@github.com:operapeking/SendToast.git
+[submodule "toast/linux"]
+	path = toast/linux
+	url = git@github.com:mklzc/sendtoast.git
